@@ -1,0 +1,135 @@
+@model CardioPrevention.Models.CardioPredictionViewModel
+
+@{
+    ViewData["Title"] = "Estimation cardiovasculaire";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-9 col-xl-8">
+            <div class="mb-4">
+                <h1 class="display-6 fw-bold">Estimation du risque cardiovasculaire</h1>
+                <p class="lead text-muted">
+                    Renseignez les informations ci-dessous pour obtenir une estimation éducative.
+                </p>
+            </div>
+
+            <div class="alert alert-warning" role="alert">
+                <strong>Information importante :</strong>
+                cet outil est destiné à une démonstration éducative. Il ne remplace pas
+                un diagnostic, un avis médical ni une consultation avec un professionnel de santé.
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+            {
+                <div class="alert alert-danger" role="alert">
+                    @Model.ErrorMessage
+                </div>
+            }
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <form asp-action="Index" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label asp-for="Input.Age" class="form-label">Âge</label>
+                                <input asp-for="Input.Age" class="form-control" type="number" min="18" max="120" placeholder="Ex. : 55" />
+                                <span asp-validation-for="Input.Age" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="Input.Sex" class="form-label">Sexe</label>
+                                <select asp-for="Input.Sex" class="form-select">
+                                    <option value="">Sélectionnez</option>
+                                    <option value="0">Femme</option>
+                                    <option value="1">Homme</option>
+                                </select>
+                                <span asp-validation-for="Input.Sex" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="Input.Trestbps" class="form-label"></label>
+                                <input asp-for="Input.Trestbps" class="form-control" type="number" min="50" max="300" step="1" placeholder="Ex. : 140" />
+                                <span asp-validation-for="Input.Trestbps" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="Input.Chol" class="form-label"></label>
+                                <input asp-for="Input.Chol" class="form-control" type="number" min="50" max="1000" step="1" placeholder="Ex. : 240" />
+                                <span asp-validation-for="Input.Chol" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="Input.Thalach" class="form-label"></label>
+                                <input asp-for="Input.Thalach" class="form-control" type="number" min="40" max="260" step="1" placeholder="Ex. : 150" />
+                                <span asp-validation-for="Input.Thalach" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="Input.Fbs" class="form-label"></label>
+                                <select asp-for="Input.Fbs" class="form-select">
+                                    <option value="">Sélectionnez</option>
+                                    <option value="0">Non</option>
+                                    <option value="1">Oui</option>
+                                </select>
+                                <span asp-validation-for="Input.Fbs" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="Input.Exang" class="form-label"></label>
+                                <select asp-for="Input.Exang" class="form-select">
+                                    <option value="">Sélectionnez</option>
+                                    <option value="0">Non</option>
+                                    <option value="1">Oui</option>
+                                </select>
+                                <span asp-validation-for="Input.Exang" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg mt-4">
+                            Obtenir l'estimation
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            @if (Model.Result is not null)
+            {
+                var badgeClass = Model.Result.RiskLevel switch
+                {
+                    "Faible" => "bg-success",
+                    "Modéré" => "bg-warning text-dark",
+                    _ => "bg-danger"
+                };
+
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h2 class="h4 mb-3">Résultat de l'estimation</h2>
+
+                        <p class="mb-2">
+                            <span class="badge @badgeClass fs-6">
+                                Risque @Model.Result.RiskLevel
+                            </span>
+                        </p>
+
+                        <p class="display-6 fw-bold mb-2">
+                            @Model.Result.Percentage.ToString("0.0") %
+                        </p>
+
+                        <p class="mb-3">@Model.Result.Message</p>
+
+                        <div class="alert alert-secondary mb-0" role="alert">
+                            @Model.Result.Disclaimer
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
